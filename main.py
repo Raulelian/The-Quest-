@@ -7,7 +7,7 @@ pygame.init()
 ANCHO = 800
 ALTO= 600
 
-AZUL_OSCURO = (10,10,50)
+AZUL_OSCURO = (20,20,80)
 
 ventana = pygame.display.set_mode((ANCHO,ALTO))
 
