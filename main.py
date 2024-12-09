@@ -7,7 +7,7 @@ pygame.init()
 ANCHO = 800
 ALTO= 600
 
-NEGRO = (0,0,0)
+AZUL_OSCURO = (10,10,50)
 
 ventana = pygame.display.set_mode((ANCHO,ALTO))
 
@@ -23,7 +23,7 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-    ventana.fill(NEGRO)
+    ventana.fill(AZUL_OSCURO)
 
     pygame.display.flip()
     reloj.tick(60)
