@@ -1,5 +1,5 @@
 import pygame
-
+from nave import Nave
 import sys
 
 class Juego:
@@ -21,13 +21,13 @@ class Juego:
                     pygame.quit()
                     sys.exit()
 
-         self.nave.mover()
-        
-         self.ventana.fill(self.color_fondo)
-         self.nave.dibujar(self.ventana)
-         
-         pygame.display.flip()
-         self.reloj.tick (60)
+            self.nave.mover()
+
+            self.ventana.fill(self.color_fondo)
+            self.nave.dibujar(self.ventana)
+
+            pygame.display.flip()
+            self.reloj.tick(60)
         
         
 
