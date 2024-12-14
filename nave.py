@@ -2,6 +2,7 @@ import pygame
 
 
 class Nave:
+
     def __init__(self, ancho_pantalla, alto_pantalla):
         self.x = 50  
         self.y = alto_pantalla // 2  
@@ -19,4 +20,8 @@ class Nave:
             self.y += self.velocidad
 
     def dibujar(self, ventana):
-        pygame.draw.rect(ventana, self.color, (self.x, self.y, self.tamano, self.tamano))
+        pygame.draw.polygon(ventana, (255,255,255), [(self.x,self.y), (self.x-20, self.y+40), (self.x+20,self.y+40 )])
+        pygame.draw.rect(ventana, (200,200,200), (self.x-15,self.y+40,30,60))
+        pygame.draw.circle(ventana, (150,150,150), (self.x-10,self.y+100),10)
+        pygame.draw.circle(ventana, (150,150,150), (self.x-10,self.y +100),10)
+
