@@ -5,12 +5,13 @@ class Nave:
 
     def __init__(self, ancho_pantalla, alto_pantalla, ruta_imagen):
         self.x = 50  
-        self.y = alto_pantalla // 2  
+        self.tamano = 40
+        self.y = alto_pantalla // 2 - self.tamano // 2
         self.velocidad = 5
         self.ancho_pantalla = ancho_pantalla
         self.alto_pantalla = alto_pantalla
-        self.tamano = 40
 
+        
 
         if not os.path.exists(ruta_imagen):
             raise FileNotFoundError(f"No se encontró la imagen en la ruta: {ruta_imagen}")
@@ -26,4 +27,5 @@ class Nave:
             self.y += self.velocidad
 
     def dibujar(self, ventana):
-        ventana.blit(self.imagen, (self.x, self.y))
+       ventana.blit(self.imagen, (self.x, self.y))
+      
