@@ -11,8 +11,10 @@ class Obstaculo:
         self.alto = 50
         self.x = ancho_pantalla
         self.y = random.randint(0, alto_pantalla - self.alto)
-        self.velocidad = random.randint(3, 7)
+        self.velocidad = random.randint(5, 9)
         self.tipo = tipo
+
+        self.colisionado = False  # Nuevo atributo
 
         # Cargar imagen según el tipo
         if self.tipo == "meteorito":
@@ -28,6 +30,7 @@ class Obstaculo:
         else:
             self.imagen = None  # No usar imagen si no existe o no es válida
             self.color = (255, 0, 0)  # Rojo por defecto
+
 
     def mover(self):
         self.x -= self.velocidad

@@ -27,5 +27,5 @@ class Nave:
             self.y += self.velocidad
 
     def dibujar(self, ventana):
-       ventana.blit(self.imagen, (self.x, self.y))
+        ventana.blit(self.imagen, (self.x, self.y))
       
