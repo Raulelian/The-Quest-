@@ -3,9 +3,10 @@ import random
 import os
 
 class Obstaculo:
-    def __init__(self, ancho_pantalla, alto_pantalla, tipo):
+    def __init__(self, ancho_pantalla, alto_pantalla, tipo, nivel):
         self.ancho_pantalla = ancho_pantalla
         self.alto_pantalla = alto_pantalla
+        self.nivel = nivel
 
         self.ancho = 50
         self.alto = 50

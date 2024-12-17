@@ -52,25 +52,26 @@ class Juego:
             obstaculo.dibujar(self.ventana)
 
     def mostrar_vidas(self):
-        fuente = pygame.font.Font(None, 36)  # Fuente de texto
+        fuente = pygame.font.Font(None, 32)  # Fuente de texto
         texto = fuente.render(f"VIDAS: {self.vidas}", True, (255, 255, 255))
         self.ventana.blit(texto, (10, 10))  # Esquina superior izquierda
 
     def mostrar_puntuacion(self):
-        fuente = pygame.font.Font(None, 36)
-        texto = fuente.render(f"PUNTOS: {self.puntuacion}", True, (255, 255, 255))
+        fuente = pygame.font.Font(None, 28)
+        texto = fuente.render(f"PUNTOS: {self.puntuacion}", True, (155, 155, 155))
         self.ventana.blit(texto, (10, 50))  # Debajo de las vidas
 
     def mostrar_nivel(self):
-        fuente = pygame.font.Font(None, 36)
-        texto = fuente.render(f"NIVEL: {self.nivel}", True, (255, 255, 255))
+        fuente = pygame.font.Font(None, 26)
+        texto = fuente.render(f"NIVEL: {self.nivel}", True, (155, 155, 155))
         self.ventana.blit(texto, (10, 90))  # Debajo de la puntuación
 
     def detectar_colisiones(self):
         nave_rect = pygame.Rect(self.nave.x, self.nave.y, self.nave.tamano, self.nave.tamano)
         for obstaculo in self.obstaculos:
             obstaculo_rect = pygame.Rect(obstaculo.x, obstaculo.y, obstaculo.ancho, obstaculo.alto)
-            if nave_rect.colliderect(obstaculo_rect):
+            if nave_rect.colliderect(obstaculo_rect) and not obstaculo.colisionado:
+                obstaculo.colisionado = True
                 print("¡Colisión detectada!")
                 sonido_explosion = pygame.mixer.Sound("assets/explosion.wav")
                 sonido_explosion.play()
