@@ -28,4 +28,16 @@ class Nave:
 
     def dibujar(self, ventana):
         ventana.blit(self.imagen, (self.x, self.y))
+
+    def girar_y_aterrizar(self, destino_x, destino_y):
+        if not hasattr(self, 'girada'):  # Atributo auxiliar para controlar el giro
+            self.imagen = pygame.transform.rotate(self.imagen, 180)  # Rotar 180 grados
+            self.girada = True  # Marcar que ya se giró
+        if self.x > destino_x:
+            self.x -= 2  # Mover a la izquierda
+        if self.y < destino_y:
+            self.y += 1  # Mover hacia abajo
+        elif self.y > destino_y:
+            self.y -= 1  # Mover hacia arriba
+
       

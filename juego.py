@@ -22,6 +22,11 @@ class Juego:
         self.tiempo_inicio_nivel = pygame.time.get_ticks()
         self.puntuacion = 0
 
+        self.modo_aterrizaje = False
+        self.planeta_mostrado = False
+        self.planeta_x = -150  # Posición inicial del planeta (fuera de pantalla)
+
+
         # Inicializar la nave
         ruta_imagen_nave = "assets/nav.png"
         self.nave = Nave(self.ancho, self.alto, ruta_imagen_nave)
@@ -31,12 +36,21 @@ class Juego:
         self.tiempo_generar_obstaculo = 1250  # Cada 1.25 segundos
         self.ultimo_obstaculo = pygame.time.get_ticks()
 
+                # Variables para el final del nivel
+        self.fin_de_nivel = False
+        self.planeta_x = -500  # Posición inicial del planeta (fuera de pantalla)
+        self.planeta_y = self.alto // 2 -200 # Centro vertical
+        self.planeta_imagen = pygame.image.load("assets/planeta.png")
+        self.planeta_imagen = pygame.transform.scale(self.planeta_imagen, (400, 400))
+
+
     def generar_obstaculo(self):
         """Genera un obstáculo nuevo en una posición aleatoria."""
-        tipo = random.choice(["meteorito", "satelite"])  # Tipos de obstáculos
-        y = random.randint(50, self.alto - 50)  # Posición vertical aleatoria
-        nuevo_obstaculo = Obstaculo(self.ancho, y, tipo, self.nivel)
-        self.obstaculos.append(nuevo_obstaculo)
+        if not self.modo_aterrizaje: 
+            tipo = random.choice(["meteorito", "satelite"])  # Tipos de obstáculos
+            y = random.randint(50, self.alto - 50)  # Posición vertical aleatoria
+            nuevo_obstaculo = Obstaculo(self.ancho, self.alto, tipo, self.nivel)
+            self.obstaculos.append(nuevo_obstaculo)
 
     def actualizar_obstaculos(self):
         """Actualiza el movimiento de los obstáculos y los elimina si salen de la pantalla."""
@@ -88,14 +102,48 @@ class Juego:
     def gestionar_nivel(self):
         """Controla la progresión entre niveles."""
         tiempo_actual = pygame.time.get_ticks()
-        if tiempo_actual - self.tiempo_inicio_nivel > self.duracion_nivel:
-            self.nivel += 1
-            self.tiempo_inicio_nivel = tiempo_actual
-            # Aumentar la dificultad
-            self.tiempo_generar_obstaculo = max(500, self.tiempo_generar_obstaculo - 200)  # Más rápidos
-            for obstaculo in self.obstaculos:
-                obstaculo.velocidad += 2  # Obstáculos más rápidos
-            print(f"¡Avanzaste al nivel {self.nivel}!")
+
+        if not self.fin_de_nivel:
+            if tiempo_actual - self.tiempo_inicio_nivel > self.duracion_nivel:
+                print("Fin del nivel alcanzado")
+                self.fin_de_nivel = True  # Activar final de nivel
+                self.obstaculos = []  # Eliminar obstáculos restantes
+        else:
+            # Mover la nave hacia el planeta
+            self.nave.girar_y_aterrizar(50, self.planeta_y + 25)  # Posición objetivo del aterrizaje
+
+
+    def mostrar_planeta(self):
+        """Dibuja el planeta y avanza su posición."""
+        if not self.planeta_mostrado:
+            self.planeta_mostrado = True
+            self.planeta_x = -150
+
+        pygame.draw.circle(self.ventana, (255, 255, 0), (self.planeta_x, self.alto // 2), 100)
+        if self.planeta_x < 150:
+            self.planeta_x += 2
+
+    def aterrizar_nave(self):
+        """Mueve la nave automáticamente al planeta."""
+        destino_x = self.planeta_x + 50
+        destino_y = self.alto // 2
+        self.nave.aterrizar(destino_x, destino_y)
+
+    def reiniciar_nivel(self):
+        """Reinicia variables para el siguiente nivel."""
+        self.modo_aterrizaje = False
+        self.planeta_mostrado = False
+        self.planeta_x = -150
+        self.tiempo_inicio_nivel = pygame.time.get_ticks()
+        self.obstaculos.clear()
+        self.nivel += 1
+
+    def dibujar_planeta(self):
+        """Dibuja el planeta en la posición actual."""
+        if self.fin_de_nivel and self.planeta_x < 50:  # Desplaza el planeta
+            self.planeta_x += 2
+        self.ventana.blit(self.planeta_imagen, (self.planeta_x, self.planeta_y))
+
 
     def bucle_principal(self):
         while self.ejecutando:
@@ -104,27 +152,30 @@ class Juego:
                     pygame.quit()
                     sys.exit()
 
-            # Movimiento de la nave
-            self.nave.mover()
+            # Movimiento de la nave si no es el final del nivel
+            if not self.fin_de_nivel:
+                self.nave.mover()
 
             # Generar obstáculos en intervalos regulares
             tiempo_actual = pygame.time.get_ticks()
-            if tiempo_actual - self.ultimo_obstaculo > self.tiempo_generar_obstaculo:
+            if tiempo_actual - self.ultimo_obstaculo > self.tiempo_generar_obstaculo and not self.fin_de_nivel:
                 self.generar_obstaculo()
                 self.ultimo_obstaculo = tiempo_actual
 
-            # Actualizar obstáculos
+            # Actualizar obstáculos existentes
             self.actualizar_obstaculos()
 
-            # Detectar colisiones
-            self.detectar_colisiones()
+            # Detectar colisiones solo si no es el final
+            if not self.fin_de_nivel:
+                self.detectar_colisiones()
 
-            # Gestionar niveles
+            # Gestionar el progreso del nivel
             self.gestionar_nivel()
 
             # Dibujar todo en la pantalla
             self.ventana.fill(self.color_fondo)  # Fondo
-            self.nave.dibujar(self.ventana)      # Nave
+            self.dibujar_planeta()              # Planeta al final
+            self.nave.dibujar(self.ventana)     # Nave
             self.dibujar_obstaculos()           # Obstáculos
             self.mostrar_vidas()                # Vidas
             self.mostrar_puntuacion()           # Puntuación
@@ -134,3 +185,8 @@ class Juego:
             pygame.display.flip()
             self.reloj.tick(60)  # 60 FPS
 
+
+
+
+
+   
