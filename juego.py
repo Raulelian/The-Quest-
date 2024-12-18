@@ -21,6 +21,8 @@ class Juego:
         self.duracion_nivel = 20000
         self.tiempo_inicio_nivel = pygame.time.get_ticks()
         self.puntuacion = 0
+        self.esperando_continuar = False
+
 
         self.fin_de_nivel = False
         self.planeta_x = self.ancho
@@ -89,12 +91,14 @@ class Juego:
                 self.planeta_x -= 2
             self.ventana.blit(self.planeta_imagen, (self.planeta_x, self.planeta_y))
 
-    def reiniciar_nivel(self):
-        """Reinicia variables para el siguiente nivel."""
-        self.fin_de_nivel = False
-        self.planeta_x = self.ancho
-        self.tiempo_inicio_nivel = pygame.time.get_ticks()
-        self.nivel += 1
+
+    def mostrar_cartel(self, texto):
+    
+        fuente = pygame.font.Font(None, 50)
+        texto_render = fuente.render(texto, True, (255, 255, 255))
+        rect_texto = texto_render.get_rect(center=(self.ancho // 2, self.alto // 2))
+        self.ventana.blit(texto_render, rect_texto)
+
 
     def bucle_principal(self):
         while self.ejecutando:
@@ -102,6 +106,8 @@ class Juego:
                 if evento.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                if self.nave.aterrizando and evento.type == pygame.KEYDOWN:
+                    self.reiniciar_nivel()
 
             if not self.fin_de_nivel:
                 self.nave.mover()
@@ -125,6 +131,11 @@ class Juego:
 
             self.mostrar_hud()
 
+        # Gestión del aterrizaje
+            if self.fin_de_nivel:
+                self.nave.girar_y_aterrizar(self.planeta_x + 50, self.planeta_y + 200)
+                if self.nave.aterrizando:
+                    self.mostrar_cartel("Pulse para continuar")
+
             pygame.display.flip()
             self.reloj.tick(60)
-
