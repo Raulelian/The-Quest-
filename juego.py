@@ -23,7 +23,6 @@ class Juego:
         self.puntuacion = 0
         self.esperando_continuar = False
 
-
         self.fin_de_nivel = False
         self.planeta_x = self.ancho
         self.planeta_y = self.alto // 2 - 200
@@ -31,42 +30,37 @@ class Juego:
         self.planeta_imagen = pygame.transform.scale(self.planeta_imagen, (400, 400))
 
         self.nave = Nave(self.ancho, self.alto, "assets/nav.png")
-
         self.obstaculos = []
         self.tiempo_generar_obstaculo = 1250
         self.ultimo_obstaculo = pygame.time.get_ticks()
 
-     
     def pantalla_inicial(self):
         self.ventana.fill(self.color_fondo)
 
-    # Fuentes
+        # Fuentes
         fuente_titulo = pygame.font.Font(None, 50)
         fuente_texto = pygame.font.Font(None, 25)
 
-    # Textos principales
+        # Textos principales
         texto_titulo = fuente_titulo.render("The Quest: La búsqueda de otro planeta", True, (255, 255, 255))
         texto_historia1 = fuente_texto.render("En un futuro distante, la Tierra ya no es habitable.", True, (200, 200, 200))
         texto_historia2 = fuente_texto.render("Como piloto de una nave espacial, tu misión es vital:", True, (200, 200, 200))
         texto_historia3 = fuente_texto.render("Explorar el cosmos en busca de un nuevo hogar para la humanidad.", True, (200, 200, 200))
 
-    # Instrucciones
+        # Instrucciones
         texto_instrucciones1 = fuente_texto.render("Instrucciones:", True, (255, 255, 255))
         texto_instrucciones2 = fuente_texto.render("- Usa las flechas para mover la nave y esquivar los obstáculos.", True, (200, 200, 200))
         texto_instrucciones3 = fuente_texto.render("- Pulsa ENTER para comenzar tu aventura.", True, (200, 200, 200))
 
-    # Posicionar textos en la pantalla
+        # Posicionar textos en la pantalla
         self.ventana.blit(texto_titulo, (self.ancho // 2 - texto_titulo.get_width() // 2, 50))
-
         self.ventana.blit(texto_historia1, (self.ancho // 2 - texto_historia1.get_width() // 2, 150))
         self.ventana.blit(texto_historia2, (self.ancho // 2 - texto_historia2.get_width() // 2, 180))
         self.ventana.blit(texto_historia3, (self.ancho // 2 - texto_historia3.get_width() // 2, 210))
-
         self.ventana.blit(texto_instrucciones1, (self.ancho // 2 - texto_instrucciones1.get_width() // 2, 300))
         self.ventana.blit(texto_instrucciones2, (self.ancho // 2 - texto_instrucciones2.get_width() // 2, 330))
         self.ventana.blit(texto_instrucciones3, (self.ancho // 2 - texto_instrucciones3.get_width() // 2, 360))
 
-    
         pygame.display.flip()
         esperando = True
         while esperando:
@@ -74,8 +68,8 @@ class Juego:
                 if evento.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-            if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
-                esperando = False
+                if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
+                    esperando = False
 
     def generar_obstaculo(self):
         """Genera un obstáculo nuevo en una posición aleatoria."""
@@ -109,11 +103,25 @@ class Juego:
                     pygame.time.delay(1000)
 
     def gestionar_nivel(self):
-        """Controla la progresión entre niveles."""
         tiempo_actual = pygame.time.get_ticks()
         if not self.fin_de_nivel and tiempo_actual - self.tiempo_inicio_nivel > self.duracion_nivel:
             self.fin_de_nivel = True
             self.obstaculos.clear()
+
+        # Transición del nivel 3 al final del juego
+        if self.nivel == 3 and self.fin_de_nivel:
+            self.ventana.fill(self.color_fondo)
+            self.mostrar_cartel("¡Felicidades! Has completado el juego. Pulsa R para reiniciar.")
+            pygame.display.flip()
+
+            esperando = True
+            while esperando:
+                for evento in pygame.event.get():
+                    if evento.type == pygame.KEYDOWN and evento.key == pygame.K_r:
+                        self.reiniciar_juego()
+                        esperando = False
+
+            return  # Detiene cualquier otra acción mientras esperamos que reinicien el juego
 
     def mostrar_hud(self):
         """Muestra el HUD con vidas, puntuación y nivel."""
@@ -132,24 +140,46 @@ class Juego:
                 self.planeta_x -= 2
             self.ventana.blit(self.planeta_imagen, (self.planeta_x, self.planeta_y))
 
-
     def mostrar_cartel(self, texto):
-    
-        fuente = pygame.font.Font(None, 50)
+        fuente = pygame.font.Font(None, 30)  # Tamaño reducido a 40
         texto_render = fuente.render(texto, True, (255, 255, 255))
         rect_texto = texto_render.get_rect(center=(self.ancho // 2, self.alto // 2))
+
+        # Asegurar que el cartel no se salga de los bordes
+        if rect_texto.left < 0:
+            rect_texto.left = 0
+        if rect_texto.right > self.ancho:
+            rect_texto.right = self.ancho
+        if rect_texto.top < 0:
+            rect_texto.top = 0
+        if rect_texto.bottom > self.alto:
+            rect_texto.bottom = self.alto
+
         self.ventana.blit(texto_render, rect_texto)
 
     def avanzar_nivel(self):
+        if self.nivel < 3:
+            self.nivel += 1
+            self.tiempo_inicio_nivel = pygame.time.get_ticks()
+            self.fin_de_nivel = False
+            self.planeta_x = self.ancho
+            self.obstaculos.clear()
+            self.nave.x = 50
+            self.nave.y = self.alto // 2 - self.nave.tamano // 2
+            self.esperando_continuar = False
+        else:
+            self.fin_de_nivel = True  # Alcanza el final del juego
 
-        self.nivel += 1
+    def reiniciar_juego(self):
+        self.vidas = 3
+        self.nivel = 1
+        self.puntuacion = 0
         self.tiempo_inicio_nivel = pygame.time.get_ticks()
         self.fin_de_nivel = False
-        self.planeta_x = self.ancho
-        self.obstaculos.clear()
+        self.esperando_continuar = False
         self.nave.x = 50
         self.nave.y = self.alto // 2 - self.nave.tamano // 2
-        self.esperando_continuar = False
+        self.obstaculos.clear()
 
     def bucle_principal(self):
         while self.ejecutando:
@@ -158,53 +188,46 @@ class Juego:
                     pygame.quit()
                     sys.exit()
 
-            # Manejar el evento para avanzar de nivel
                 if self.esperando_continuar and evento.type == pygame.KEYDOWN:
                     self.avanzar_nivel()
 
-        # Si estamos esperando continuar, solo mostramos el cartel y pausamos el juego
             if self.esperando_continuar:
+            # Pantalla de transición entre niveles
                 self.ventana.fill(self.color_fondo)
-                self.mostrar_cartel("Pulse cualquier tecla para continuar")
+                self.mostrar_cartel(f"Nivel {self.nivel} completado. Pulsa cualquier tecla para continuar.")
                 pygame.display.flip()
                 self.reloj.tick(60)
                 continue
 
-        # Movimiento de la nave solo si no estamos al final del nivel
             if not self.fin_de_nivel:
                 self.nave.mover()
 
-        # Generar obstáculos según el tiempo transcurrido
             tiempo_actual = pygame.time.get_ticks()
             if tiempo_actual - self.ultimo_obstaculo > self.tiempo_generar_obstaculo and not self.fin_de_nivel:
                 self.generar_obstaculo()
                 self.ultimo_obstaculo = tiempo_actual
 
-        # Actualizar obstáculos y detectar colisiones
             self.actualizar_obstaculos()
             if not self.fin_de_nivel:
                 self.detectar_colisiones()
 
-        # Gestión del nivel
             self.gestionar_nivel()
 
-        # Dibujar elementos del juego
-            self.ventana.fill(self.color_fondo)  # Fondo
-            self.dibujar_planeta()  # Planeta
-            self.nave.dibujar(self.ventana)  # Nave
-            for obstaculo in self.obstaculos:  # Obstáculos
+            self.ventana.fill(self.color_fondo)
+            self.dibujar_planeta()
+            self.nave.dibujar(self.ventana)
+            for obstaculo in self.obstaculos:
                 obstaculo.dibujar(self.ventana)
 
-        # Mostrar el HUD
             self.mostrar_hud()
 
-        # Gestión del aterrizaje al final del nivel
-            if self.fin_de_nivel:
+        # Verificar aterrizaje y activar transición
+            if self.fin_de_nivel and self.nivel < 3:
                 self.nave.girar_y_aterrizar(self.planeta_x + 50, self.planeta_y + 200)
-                if self.nave.aterrizando:
+                if not self.nave.aterrizando and self.planeta_x <= 150:
+                # Solo mostramos el cartel después de aterrizar completamente
                     self.esperando_continuar = True
 
-        # Actualizar pantalla
             pygame.display.flip()
             self.reloj.tick(60)
 
