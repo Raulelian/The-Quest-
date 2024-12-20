@@ -107,35 +107,44 @@ class Juego:
                     pygame.quit()
                     sys.exit()
                 if self.nave.aterrizando and evento.type == pygame.KEYDOWN:
-                    self.reiniciar_nivel()
+                    self.reiniciar_nivel()  # Reinicia el nivel al pulsar una tecla tras aterrizar
 
+        # Movimiento de la nave solo si no estamos en el fin del nivel
             if not self.fin_de_nivel:
-                self.nave.mover()
+             self.nave.mover()
 
+        # Generar obstáculos según el tiempo transcurrido
             tiempo_actual = pygame.time.get_ticks()
             if tiempo_actual - self.ultimo_obstaculo > self.tiempo_generar_obstaculo and not self.fin_de_nivel:
                 self.generar_obstaculo()
                 self.ultimo_obstaculo = tiempo_actual
 
+        # Actualizar obstáculos y detectar colisiones
             self.actualizar_obstaculos()
             if not self.fin_de_nivel:
-                self.detectar_colisiones()
+             self.detectar_colisiones()
 
+        # Gestión del nivel
             self.gestionar_nivel()
 
-            self.ventana.fill(self.color_fondo)
-            self.dibujar_planeta()
-            self.nave.dibujar(self.ventana)
-            for obstaculo in self.obstaculos:
+        # Dibujar elementos del juego
+            self.ventana.fill(self.color_fondo)  # Fondo
+            self.dibujar_planeta()  # Planeta
+            self.nave.dibujar(self.ventana)  # Nave
+            for obstaculo in self.obstaculos:  # Obstáculos
                 obstaculo.dibujar(self.ventana)
 
+        # Mostrar el HUD
             self.mostrar_hud()
 
-        # Gestión del aterrizaje
+        # Gestión del aterrizaje al final del nivel
             if self.fin_de_nivel:
-                self.nave.girar_y_aterrizar(self.planeta_x + 50, self.planeta_y + 200)
-                if self.nave.aterrizando:
-                    self.mostrar_cartel("Pulse para continuar")
+             self.nave.girar_y_aterrizar(self.planeta_x + 50, self.planeta_y + 200)
+             if self.nave.aterrizando:
+                 self.mostrar_cartel("Pulse cualquier tecla para continuar")
 
+        # Actualizar pantalla
             pygame.display.flip()
             self.reloj.tick(60)
+
+
