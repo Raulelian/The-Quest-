@@ -36,17 +36,47 @@ class Juego:
         self.tiempo_generar_obstaculo = 1250
         self.ultimo_obstaculo = pygame.time.get_ticks()
 
+     
+    def pantalla_inicial(self):
+        self.ventana.fill(self.color_fondo)
+
+    # Fuentes
+        fuente_titulo = pygame.font.Font(None, 50)
+        fuente_texto = pygame.font.Font(None, 25)
+
+    # Textos principales
+        texto_titulo = fuente_titulo.render("The Quest: La búsqueda de otro planeta", True, (255, 255, 255))
+        texto_historia1 = fuente_texto.render("En un futuro distante, la Tierra ya no es habitable.", True, (200, 200, 200))
+        texto_historia2 = fuente_texto.render("Como piloto de una nave espacial, tu misión es vital:", True, (200, 200, 200))
+        texto_historia3 = fuente_texto.render("Explorar el cosmos en busca de un nuevo hogar para la humanidad.", True, (200, 200, 200))
+
+    # Instrucciones
+        texto_instrucciones1 = fuente_texto.render("Instrucciones:", True, (255, 255, 255))
+        texto_instrucciones2 = fuente_texto.render("- Usa las flechas para mover la nave y esquivar los obstáculos.", True, (200, 200, 200))
+        texto_instrucciones3 = fuente_texto.render("- Pulsa ENTER para comenzar tu aventura.", True, (200, 200, 200))
+
+    # Posicionar textos en la pantalla
+        self.ventana.blit(texto_titulo, (self.ancho // 2 - texto_titulo.get_width() // 2, 50))
+
+        self.ventana.blit(texto_historia1, (self.ancho // 2 - texto_historia1.get_width() // 2, 150))
+        self.ventana.blit(texto_historia2, (self.ancho // 2 - texto_historia2.get_width() // 2, 180))
+        self.ventana.blit(texto_historia3, (self.ancho // 2 - texto_historia3.get_width() // 2, 210))
+
+        self.ventana.blit(texto_instrucciones1, (self.ancho // 2 - texto_instrucciones1.get_width() // 2, 300))
+        self.ventana.blit(texto_instrucciones2, (self.ancho // 2 - texto_instrucciones2.get_width() // 2, 330))
+        self.ventana.blit(texto_instrucciones3, (self.ancho // 2 - texto_instrucciones3.get_width() // 2, 360))
+
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        pygame.display.flip()
+        esperando = True
+        while esperando:
+            for evento in pygame.event.get():
+                if evento.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+            if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
+                esperando = False
+
     def generar_obstaculo(self):
         """Genera un obstáculo nuevo en una posición aleatoria."""
         if not self.fin_de_nivel:
