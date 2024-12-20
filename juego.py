@@ -36,6 +36,17 @@ class Juego:
         self.tiempo_generar_obstaculo = 1250
         self.ultimo_obstaculo = pygame.time.get_ticks()
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     def generar_obstaculo(self):
         """Genera un obstáculo nuevo en una posición aleatoria."""
         if not self.fin_de_nivel:
@@ -99,6 +110,16 @@ class Juego:
         rect_texto = texto_render.get_rect(center=(self.ancho // 2, self.alto // 2))
         self.ventana.blit(texto_render, rect_texto)
 
+    def avanzar_nivel(self):
+
+        self.nivel += 1
+        self.tiempo_inicio_nivel = pygame.time.get_ticks()
+        self.fin_de_nivel = False
+        self.planeta_x = self.ancho
+        self.obstaculos.clear()
+        self.nave.x = 50
+        self.nave.y = self.alto // 2 - self.nave.tamano // 2
+        self.esperando_continuar = False
 
     def bucle_principal(self):
         while self.ejecutando:
@@ -106,12 +127,22 @@ class Juego:
                 if evento.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if self.nave.aterrizando and evento.type == pygame.KEYDOWN:
-                    self.reiniciar_nivel()  # Reinicia el nivel al pulsar una tecla tras aterrizar
 
-        # Movimiento de la nave solo si no estamos en el fin del nivel
+            # Manejar el evento para avanzar de nivel
+                if self.esperando_continuar and evento.type == pygame.KEYDOWN:
+                    self.avanzar_nivel()
+
+        # Si estamos esperando continuar, solo mostramos el cartel y pausamos el juego
+            if self.esperando_continuar:
+                self.ventana.fill(self.color_fondo)
+                self.mostrar_cartel("Pulse cualquier tecla para continuar")
+                pygame.display.flip()
+                self.reloj.tick(60)
+                continue
+
+        # Movimiento de la nave solo si no estamos al final del nivel
             if not self.fin_de_nivel:
-             self.nave.mover()
+                self.nave.mover()
 
         # Generar obstáculos según el tiempo transcurrido
             tiempo_actual = pygame.time.get_ticks()
@@ -122,7 +153,7 @@ class Juego:
         # Actualizar obstáculos y detectar colisiones
             self.actualizar_obstaculos()
             if not self.fin_de_nivel:
-             self.detectar_colisiones()
+                self.detectar_colisiones()
 
         # Gestión del nivel
             self.gestionar_nivel()
@@ -139,12 +170,11 @@ class Juego:
 
         # Gestión del aterrizaje al final del nivel
             if self.fin_de_nivel:
-             self.nave.girar_y_aterrizar(self.planeta_x + 50, self.planeta_y + 200)
-             if self.nave.aterrizando:
-                 self.mostrar_cartel("Pulse cualquier tecla para continuar")
+                self.nave.girar_y_aterrizar(self.planeta_x + 50, self.planeta_y + 200)
+                if self.nave.aterrizando:
+                    self.esperando_continuar = True
 
         # Actualizar pantalla
             pygame.display.flip()
             self.reloj.tick(60)
-
 
